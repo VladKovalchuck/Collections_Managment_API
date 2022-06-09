@@ -9,7 +9,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipelineapp.UseSwagger();
+
+app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
