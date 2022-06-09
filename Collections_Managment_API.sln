@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Collections_Managment_API", "Collections_Managment_API\Collections_Managment_API.csproj", "{0C82DB3A-2C9F-424D-810E-0FBD5A2A28F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Collections_Managment_API.Data", "Collections_Managment_API.Data\Collections_Managment_API.Data.csproj", "{144BF989-A984-4090-815A-DA1667C559A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{0C82DB3A-2C9F-424D-810E-0FBD5A2A28F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C82DB3A-2C9F-424D-810E-0FBD5A2A28F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C82DB3A-2C9F-424D-810E-0FBD5A2A28F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{144BF989-A984-4090-815A-DA1667C559A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{144BF989-A984-4090-815A-DA1667C559A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{144BF989-A984-4090-815A-DA1667C559A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{144BF989-A984-4090-815A-DA1667C559A3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
