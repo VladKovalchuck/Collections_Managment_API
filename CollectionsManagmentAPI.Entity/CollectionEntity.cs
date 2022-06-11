@@ -7,6 +7,6 @@ public class CollectionEntity
     public string Description { get; set; }
     public string Topic { get; set; }
 
-    public List<ItemEntity> Items { get; set; }
-    public List<TagEntity> Tags { get; set; }
+    public ICollection<ItemEntity> Items { get; set; }
+    public ICollection<TagEntity> Tags { get; set; }
 }

@@ -7,7 +7,7 @@ namespace CollectionsManagmentAPI.DataAccess.Repositories;
 public class PgSqlCollectionsRepository<T> : IRepository<T> where T : class
 {
     private readonly CollectionsDbContext _context;
-    private DbSet<T> dbSet;
+    private readonly DbSet<T> dbSet;
 
     public PgSqlCollectionsRepository(CollectionsDbContext context)
     {

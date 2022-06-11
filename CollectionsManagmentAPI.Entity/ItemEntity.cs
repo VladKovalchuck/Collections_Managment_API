@@ -6,7 +6,7 @@ public class ItemEntity
     public string Name { get; set; }
     public int Likes { get; set; }
     
-    public List<TagEntity> Tags { get; set; }
+    public ICollection<TagEntity> Tags { get; set; }
     public CollectionEntity Collection { get; set; }
-    public List<CommentEntity> Comments { get; set; }
+    public ICollection<CommentEntity> Comments { get; set; }
 }
