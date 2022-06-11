@@ -1,39 +1,40 @@
 using CollectionsManagmentAPI.DataAccess.Interfaces;
 using CollectionsManagmentAPI.Entity;
+using Microsoft.EntityFrameworkCore;
 
 namespace CollectionsManagmentAPI.DataAccess.Repositories;
 
-public class PgSqlCollectionRepository : IRepository<CollectionEntity>
+public class PgSqlCollectionsRepository<T> : IRepository<T> where T : class
 {
     private readonly CollectionsDbContext _context;
-    public PgSqlCollectionRepository(CollectionsDbContext context) => _context = context;
+    public PgSqlCollectionsRepository(CollectionsDbContext context) => _context = context;
     
-    public IEnumerable<CollectionEntity> GetAll()
+    public async Task<IEnumerable<T>> GetAll()
     {
-        return _context.Collections.ToList();
+        return await _context.Set<T>().ToListAsync();
     }
 
-    public CollectionEntity GetById(int id)
+    public async Task<T> GetById(int id)
     {
-        return _context.Collections.Find(id);
+        return await _context.Set<T>().FindAsync(id);
     }
 
-    public void Create(CollectionEntity item)
+    public async void Create(T item)
     {
-        _context.Collections.Add(item);
-        _context.SaveChanges();
+        await _context.Set<T>().AddAsync(item);
+        await _context.SaveChangesAsync();
     }
 
-    public void Update(CollectionEntity item)
+    public async void Update(T item)   
     {
-        _context.Collections.Update(item);
-        _context.SaveChanges();
+        _context.Set<T>().Update(item);
+        await _context.SaveChangesAsync();
     }
 
-    public void Delete(int id)
+    public async void Delete(int id)
     {
-        CollectionEntity collection = _context.Collections.Find(id);
+        T collection = await _context.Set<T>().FindAsync(id);
         if (id != null)
-            _context.Collections.Remove(collection);
+            _context.Set<T>().Remove(collection);
     }
 }
