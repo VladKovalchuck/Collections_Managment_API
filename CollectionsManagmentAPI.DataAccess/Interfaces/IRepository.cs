@@ -2,7 +2,7 @@ using CollectionsManagmentAPI.Entity;
 
 namespace CollectionsManagmentAPI.DataAccess.Interfaces;
 
-interface IRepository<T> where T : class
+public interface IRepository<T> where T : class
 {
     Task<IQueryable<T>> GetAll();
     Task<T> GetById(int id);
