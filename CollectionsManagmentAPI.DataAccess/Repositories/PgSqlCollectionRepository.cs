@@ -9,9 +9,9 @@ public class PgSqlCollectionsRepository<T> : IRepository<T> where T : class
     private readonly CollectionsDbContext _context;
     public PgSqlCollectionsRepository(CollectionsDbContext context) => _context = context;
     
-    public async Task<IEnumerable<T>> GetAll()
+    public async Task<IQueryable<T>> GetAll()
     {
-        return await _context.Set<T>().ToListAsync();
+        return await _context.Set<T>().ToListAsync() as IQueryable<T>;
     }
 
     public async Task<T> GetById(int id)
@@ -19,19 +19,19 @@ public class PgSqlCollectionsRepository<T> : IRepository<T> where T : class
         return await _context.Set<T>().FindAsync(id);
     }
 
-    public async void Create(T item)
+    public async Task Create(T item)
     {
         await _context.Set<T>().AddAsync(item);
         await _context.SaveChangesAsync();
     }
 
-    public async void Update(T item)   
+    public async Task Update(T item)   
     {
         _context.Set<T>().Update(item);
         await _context.SaveChangesAsync();
     }
 
-    public async void Delete(int id)
+    public async Task Delete(int id)
     {
         T collection = await _context.Set<T>().FindAsync(id);
         if (id != null)
