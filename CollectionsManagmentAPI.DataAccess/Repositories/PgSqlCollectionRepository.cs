@@ -15,9 +15,9 @@ public class PgSqlCollectionsRepository<T> : IRepository<T> where T : class
         dbSet = _context.Set<T>();
     } 
     
-    public async Task<IQueryable<T>> GetAll()
+    public IQueryable<T> GetAll()
     {
-        return await dbSet.AsNoTracking().ToListAsync() as IQueryable<T>;
+        return dbSet.AsNoTracking();
     }
 
     public async Task<T> GetById(int id)
