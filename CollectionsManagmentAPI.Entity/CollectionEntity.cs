@@ -8,4 +8,5 @@ public class CollectionEntity
     public string Topic { get; set; }
 
     public List<ItemEntity> Items { get; set; }
+    public List<TagEntity> Tags { get; set; }
 }
