@@ -13,6 +13,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\CollectionsManagmentAPI.DataAccess\CollectionsManagmentAPI.DataAccess.csproj" />
+      <ProjectReference Include="..\CollectionsManagmentAPI.Service\CollectionsManagmentAPI.Service.csproj" />
     </ItemGroup>
 
 </Project>

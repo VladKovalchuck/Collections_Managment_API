@@ -8,9 +8,12 @@
 
     <ItemGroup>
       <Folder Include="Helpers" />
-      <Folder Include="Interfaces" />
-      <Folder Include="Service" />
       <Folder Include="Utils" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CollectionsManagmentAPI.DataAccess\CollectionsManagmentAPI.DataAccess.csproj" />
+      <ProjectReference Include="..\CollectionsManagmentAPI.Entity\CollectionsManagmentAPI.Entity.csproj" />
     </ItemGroup>
 
 </Project>

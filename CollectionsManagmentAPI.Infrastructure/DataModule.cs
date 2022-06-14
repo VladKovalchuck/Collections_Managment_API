@@ -9,11 +9,11 @@ namespace CollectionsManagmentAPI.Infrastructure;
 
 public static class DataModule
 {
-    /*public static ISeviceCollection AddDatabase(IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("CollectionsDB");
         services.AddTransient(typeof(IRepository<>), typeof(PgSqlCollectionsRepository<>));
         services.AddDbContext<CollectionsDbContext>(options => { options.UseNpgsql(connectionString); });
         return services;
-    }   */
+    }   
 }

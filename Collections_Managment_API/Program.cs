@@ -1,25 +1,30 @@
 using CollectionsManagmentAPI.DataAccess;
+using CollectionsManagmentAPI.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<CollectionsDbContext>(
-    o => o.UseNpgsql(builder.Configuration.GetConnectionString("CollectionsDB")));
+builder.Services.AddSwaggerGen(options =>
+{
+    options.EnableAnnotations();
+    options.SwaggerDoc("v1", new OpenApiInfo{Title = "CollectionManagmentAPI", Version = "v1"});
+});
+builder.Services.AddBusiness();
+builder.Services.AddDatabase(builder.Configuration);
+/*builder.Services.AddDbContext<CollectionsDbContext>(
+    o => o.UseNpgsql(builder.Configuration.GetConnectionString("CollectionsDB")));*/
 
 var app = builder.Build();
 
-
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(options => options.SwaggerEndpoint("v1/swagger.json", "CollectionManagmentAPI"));
 
 app.UseHttpsRedirection();
-
+app.UseRouting();
 app.UseAuthentication();
 
 app.MapControllers();
