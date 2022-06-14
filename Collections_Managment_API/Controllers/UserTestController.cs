@@ -25,13 +25,8 @@ public class UserTestController : Controller
     }
 
     [HttpPost("createUser/")]
-    public async Task<ActionResult<UserEntity>> Create(string username, string emailaddress, string password, string firstname, string surname)
+    public async Task<ActionResult<UserEntity>> Create(UserEntity user)
     {
-        UserEntity user = new UserEntity()
-        {
-            Username = username, EmailAddress = emailaddress, Password = password, FirstName = firstname,
-            Surname = surname
-        };
         if (user == null)
         {
             return BadRequest();
@@ -42,20 +37,8 @@ public class UserTestController : Controller
     }
     
     [HttpPut("updateUser/")]
-    public async Task<ActionResult<UserEntity>> Update(int id, string username, string firstname, string surname)
+    public async Task<ActionResult<UserEntity>> Update(UserEntity user)
     {
-        var userOld = await _userService.GetById(id);
-        if (userOld == null)
-        {
-            return BadRequest();
-        }
-
-        UserEntity user = new UserEntity()
-        {
-            Id = id, Username = username, FirstName = firstname, Surname = surname, EmailAddress = userOld.EmailAddress,
-            Password = userOld.Password
-        };
-
         await _userService.Update(user);
         return Ok(user);
     }
