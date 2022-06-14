@@ -1,4 +1,3 @@
-using CollectionsManagmentAPI.DataAccess;
 using CollectionsManagmentAPI.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;

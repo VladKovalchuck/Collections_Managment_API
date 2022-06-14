@@ -3,14 +3,14 @@ using CollectionsManagmentAPI.DataAccess.Interfaces;
 using CollectionsManagmentAPI.DataAccess.Repositories;
 using CollectionsManagmentAPI.Entity;
 using CollectionsManagmentAPI.Service.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace CollectionsManagmentAPI.Service.Service;
 
 public class UserService : IUserService
 {
     private readonly IRepository<UserEntity> _userRepository;
-
-
+    
     public UserService(IRepository<UserEntity> userRepository)
     {
         _userRepository = userRepository;
@@ -36,5 +36,12 @@ public class UserService : IUserService
     {
         bool result = await _userRepository.Delete(id);
         return result;
+    }
+
+    public async Task<UserEntity> SearchByLogin(string login)
+    {
+        var users = _userRepository.GetAll();
+        var user = await users.FirstOrDefaultAsync(u => u.Username == login);
+        return user;
     }
 }

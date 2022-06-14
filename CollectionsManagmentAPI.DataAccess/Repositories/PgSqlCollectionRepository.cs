@@ -40,9 +40,10 @@ public class PgSqlCollectionsRepository<T> : IRepository<T> where T : class
     public async Task<bool> Delete(int id)
     {
         T item = await dbSet.FindAsync(id);
-        if (id != null)
+        if (item != null)
         {
             dbSet.Remove(item);
+            await _context.SaveChangesAsync();
             return true;
         }
 

@@ -8,4 +8,5 @@ public interface IUserService
     Task Create(UserEntity user);
     Task Update(UserEntity user);
     Task<bool> Delete(int id);
+    Task<UserEntity> SearchByLogin(string login);
 }
