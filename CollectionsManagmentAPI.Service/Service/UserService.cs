@@ -40,8 +40,7 @@ public class UserService : IUserService
 
     public async Task<UserEntity> SearchByLogin(string login)
     {
-        var users = _userRepository.GetAll();
-        var user = await users.FirstOrDefaultAsync(u => u.Username == login);
+        var user = _userRepository.GetAll().FirstOrDefault(u => u.Username == login);
         return user;
     }
 }

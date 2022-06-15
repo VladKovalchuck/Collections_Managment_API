@@ -4,7 +4,7 @@ namespace CollectionsManagmentAPI.Service.Interfaces;
 
 public interface IIdentityService
 {
-    void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt);
-    bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt);
+    void CreatePasswordHash(string password, out byte[] passwordHash);
+    bool VerifyPasswordHash(string password, byte[] passwordHash);
     string CreateToken(UserEntity user);
 }

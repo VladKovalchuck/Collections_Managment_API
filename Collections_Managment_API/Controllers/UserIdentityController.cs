@@ -17,13 +17,23 @@ public class UserIdentityController : Controller
     }
     
     [HttpPost("register")]
-    public async Task<ActionResult<UserEntity>> Register(string username, string email, string firstname, string surname, string password)
+    public async Task<ActionResult<UserEntity>> Register(RegisterModel registerModel)
     {
-        _identityService.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
-
-        UserEntity user = new UserEntity()
+        UserEntity user = await _userService.SearchByLogin(registerModel.Username);
+        if (user != null)
         {
-            PasswordHash = passwordHash, PasswordSalt = passwordSalt, Username = username, EmailAddress = email, FirstName = firstname, Surname = surname
+            return BadRequest("this username is already in use");
+        }
+        
+        _identityService.CreatePasswordHash(registerModel.Password, out byte[] passwordHash);
+
+        user = new UserEntity()
+        {
+            PasswordHash = passwordHash,
+            Username = registerModel.Username, 
+            EmailAddress = registerModel.EmailAddress, 
+            FirstName = registerModel.FirstName, 
+            LastName = registerModel.LastName
         };
 
         await _userService.Create(user);
@@ -32,15 +42,15 @@ public class UserIdentityController : Controller
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<string>> Login(LoginInfo loginInfo)
+    public async Task<ActionResult<string>> Login(LoginModel loginModel)
     {
-        var user = await _userService.SearchByLogin(loginInfo.Login);
+        var user = await _userService.SearchByLogin(loginModel.Login);
         if (user == null)
         {
             return BadRequest("User not found.");
         }
 
-        if (!_identityService.VerifyPasswordHash(loginInfo.Password, user.PasswordHash, user.PasswordSalt))
+        if (!_identityService.VerifyPasswordHash(loginModel.Password, user.PasswordHash))
         {
             return BadRequest("Wrong password.");
         }
