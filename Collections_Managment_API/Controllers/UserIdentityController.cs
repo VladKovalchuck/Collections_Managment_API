@@ -47,7 +47,7 @@ public class UserIdentityController : Controller
         var user = await _userService.SearchByLogin(loginModel.Login);
         if (user == null)
         {
-            return BadRequest("User not found.");
+            return NotFound("User not found.");
         }
 
         if (!_identityService.VerifyPasswordHash(loginModel.Password, user.PasswordHash))

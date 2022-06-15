@@ -42,8 +42,8 @@ public class UserController : Controller
             PasswordHash = passwordHash,
             Username = registerModel.Username, 
             EmailAddress = registerModel.EmailAddress, 
-            FirstName = registerModel.FirstName, 
-            LastName = registerModel.LastName
+            FirstName = registerModel?.FirstName, 
+            LastName = registerModel?.LastName
         };
         await _userService.Create(user);
         return Ok(user);
@@ -52,7 +52,7 @@ public class UserController : Controller
     [HttpPut("updateUser")]
     public async Task<ActionResult<UserEntity>> Update(UpdateModel updateModel)
     {
-        var user = await _userService.SearchByLogin(updateModel.Username);
+        var user = await _userService.GetById(updateModel.Id);
         user.Username = updateModel.Username;
         user.EmailAddress = updateModel.EmailAddress;
         user.FirstName = updateModel.FirstName;
@@ -74,7 +74,7 @@ public class UserController : Controller
         var user = await _userService.SearchByLogin(login);
         if (user == null)
         {
-            return BadRequest();
+            return NotFound();
         }
 
         return Ok(user);
