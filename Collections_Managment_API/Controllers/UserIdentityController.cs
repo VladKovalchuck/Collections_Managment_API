@@ -19,7 +19,7 @@ public class UserIdentityController : Controller
     [HttpPost("register")]
     public async Task<ActionResult<UserEntity>> Register(RegisterModel registerModel)
     {
-        UserEntity user = await _userService.SearchByLogin(registerModel.Username);
+        var user = await _userService.SearchByLogin(registerModel.Username);
         if (user != null)
         {
             return BadRequest("this username is already in use");

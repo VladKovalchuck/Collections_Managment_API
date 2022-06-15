@@ -1,5 +1,6 @@
 using CollectionsManagmentAPI.Entity;
 using CollectionsManagmentAPI.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Annotations;
@@ -7,6 +8,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace Collections_Managment_API.Controllers;
 
 [ApiController]
+[Authorize (Roles = "Admin")]
 [SwaggerTag("User")]
 public class UserController : Controller
 {
@@ -19,17 +21,31 @@ public class UserController : Controller
         _identityService = identityService;
     }
     
-    [HttpGet("getUser/{id}")]
-    public async Task<UserEntity> GetById(int id) 
+    [HttpGet("getUser/{id}"), Authorize]
+    public async Task<ActionResult<UserModel>> GetById(int id) 
     {
         var user = await _userService.GetById(id);
-        return user;
+        if (user == null)
+        {
+            return NotFound("User not found");
+        }
+
+        UserModel resultUser = new UserModel()
+        {
+            Id = user.Id,
+            Username = user.Username,
+            EmailAddress = user.EmailAddress,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            PasswordHash = user.PasswordHash
+        };
+        return Ok(resultUser);
     }
 
     [HttpPost("createUser")]
     public async Task<ActionResult<UserEntity>> Create(RegisterModel registerModel)
     {
-        UserEntity user = await _userService.SearchByLogin(registerModel.Username);
+        var user = await _userService.SearchByLogin(registerModel.Username);
         if (user != null)
         {
             return BadRequest("this username is already in use");
@@ -76,7 +92,16 @@ public class UserController : Controller
         {
             return NotFound();
         }
-
-        return Ok(user);
+        
+        UserModel resultUser = new UserModel()
+        {
+            Id = user.Id,
+            Username = user.Username,
+            EmailAddress = user.EmailAddress,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            PasswordHash = user.PasswordHash
+        };
+        return Ok(resultUser);
     }
 }
