@@ -2,9 +2,11 @@ using System.Text;
 using CollectionsManagmentAPI.Entity;
 using CollectionsManagmentAPI.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -17,30 +19,33 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.EnableAnnotations();
     options.SwaggerDoc("v1", new OpenApiInfo{Title = "CollectionManagmentAPI", Version = "v1"});
-    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-    {
-        Description = "\"bearer {Token}\"",
-        In = ParameterLocation.Header,
-        Name = "Autorization",
-        Type = SecuritySchemeType.ApiKey
-    });
-    
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
+    options.AddSecurityDefinition(
+        "token",
+        new OpenApiSecurityScheme
         {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type=ReferenceType.SecurityScheme,
-                    Id="Bearer"
-                }
-            },
-            new string[]{}
+            Type = SecuritySchemeType.Http,
+            BearerFormat = "JWT",
+            Scheme = "Bearer",
+            In = ParameterLocation.Header,
+            Name = HeaderNames.Authorization
         }
-    });
-    
-    options.OperationFilter<SecurityRequirementsOperationFilter>();
+    );
+    options.AddSecurityRequirement(
+        new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "token"
+                    },
+                },
+                Array.Empty<string>()
+            }
+        }
+    );
 });
 builder.Services.AddBusiness();
 builder.Services.AddDatabase(builder.Configuration);

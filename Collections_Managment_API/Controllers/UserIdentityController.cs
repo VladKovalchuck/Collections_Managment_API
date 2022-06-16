@@ -1,4 +1,5 @@
 using CollectionsManagmentAPI.Entity;
+using CollectionsManagmentAPI.Entity.Enums;
 using Microsoft.AspNetCore.Mvc;
 using CollectionsManagmentAPI.Service.Interfaces;
 
@@ -32,13 +33,25 @@ public class UserIdentityController : Controller
             PasswordHash = passwordHash,
             Username = registerModel.Username, 
             EmailAddress = registerModel.EmailAddress, 
+            RoleId = (int)Roles.User,
             FirstName = registerModel.FirstName, 
             LastName = registerModel.LastName
         };
 
         await _userService.Create(user);
         
-        return Ok(user);
+        UserModel resultUser = new UserModel()
+        {
+            Id = user.Id,
+            Username = user.Username,
+            EmailAddress = user.EmailAddress,
+            RoleId = user.RoleId,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            PasswordHash = user.PasswordHash
+        };
+        
+        return Ok(resultUser);
     }
 
     [HttpPost("login")]

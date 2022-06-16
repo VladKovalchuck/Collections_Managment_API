@@ -1,4 +1,5 @@
 using CollectionsManagmentAPI.Entity;
+using CollectionsManagmentAPI.Entity.Enums;
 using CollectionsManagmentAPI.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,7 @@ public class UserController : Controller
         _identityService = identityService;
     }
     
-    [HttpGet("getUser/{id}"), Authorize]
+    [HttpGet("getUser/{id}")]
     public async Task<ActionResult<UserModel>> GetById(int id) 
     {
         var user = await _userService.GetById(id);
@@ -35,6 +36,7 @@ public class UserController : Controller
             Id = user.Id,
             Username = user.Username,
             EmailAddress = user.EmailAddress,
+            RoleId = user.RoleId,
             FirstName = user.FirstName,
             LastName = user.LastName,
             PasswordHash = user.PasswordHash
@@ -43,7 +45,7 @@ public class UserController : Controller
     }
 
     [HttpPost("createUser")]
-    public async Task<ActionResult<UserEntity>> Create(RegisterModel registerModel)
+    public async Task<ActionResult<UserModel>> Create(RegisterModel registerModel)
     {
         var user = await _userService.SearchByLogin(registerModel.Username);
         if (user != null)
@@ -58,24 +60,48 @@ public class UserController : Controller
             PasswordHash = passwordHash,
             Username = registerModel.Username, 
             EmailAddress = registerModel.EmailAddress, 
+            RoleId = (int)Roles.User,
             FirstName = registerModel?.FirstName, 
             LastName = registerModel?.LastName
         };
         await _userService.Create(user);
-        return Ok(user);
+        
+        UserModel resultUser = new UserModel()
+        {
+            Id = user.Id,
+            Username = user.Username,
+            EmailAddress = user.EmailAddress,
+            RoleId = user.RoleId,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            PasswordHash = user.PasswordHash
+        };
+        return Ok(resultUser);
     }
     
     [HttpPut("updateUser")]
-    public async Task<ActionResult<UserEntity>> Update(UpdateModel updateModel)
+    public async Task<ActionResult<UserModel>> Update(UpdateModel updateModel)
     {
         var user = await _userService.GetById(updateModel.Id);
         user.Username = updateModel.Username;
         user.EmailAddress = updateModel.EmailAddress;
+        user.RoleId = updateModel.RoleId;
         user.FirstName = updateModel.FirstName;
         user.LastName = updateModel.LastName;
         
         await _userService.Update(user);
-        return Ok(user);
+        
+        UserModel resultUser = new UserModel()
+        {
+            Id = user.Id,
+            Username = user.Username,
+            EmailAddress = user.EmailAddress,
+            RoleId = user.RoleId,
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            PasswordHash = user.PasswordHash
+        };
+        return Ok(resultUser);
     }
     
     [HttpDelete("deleteUser")]
@@ -85,7 +111,7 @@ public class UserController : Controller
     }
 
     [HttpGet("searchUser")]
-    public async Task<ActionResult<UserEntity>> SearchByLogin(string login)
+    public async Task<ActionResult<UserModel>> SearchByLogin(string login)
     {
         var user = await _userService.SearchByLogin(login);
         if (user == null)
@@ -98,6 +124,7 @@ public class UserController : Controller
             Id = user.Id,
             Username = user.Username,
             EmailAddress = user.EmailAddress,
+            RoleId = user.RoleId,
             FirstName = user.FirstName,
             LastName = user.LastName,
             PasswordHash = user.PasswordHash

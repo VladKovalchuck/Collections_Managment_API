@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using CollectionsManagmentAPI.Entity;
+using CollectionsManagmentAPI.Entity.Enums;
 using CollectionsManagmentAPI.Service.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -35,7 +36,7 @@ public class IdentityService : IIdentityService
         List<Claim> claims = new List<Claim>()
         {
             new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Role, "Admin")
+            new Claim(ClaimTypes.Role, ((Roles)user.RoleId).ToString())
         };
         
         var token = new JwtSecurityToken(
