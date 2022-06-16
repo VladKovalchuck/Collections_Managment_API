@@ -23,7 +23,7 @@ public class UserIdentityController : Controller
         var user = await _userService.SearchByLogin(registerModel.Username);
         if (user != null)
         {
-            return BadRequest("this username is already in use");
+            return BadRequest("This username is already in use");
         }
         
         _identityService.CreatePasswordHash(registerModel.Password, out byte[] passwordHash);
@@ -61,6 +61,11 @@ public class UserIdentityController : Controller
         if (user == null)
         {
             return NotFound("User not found.");
+        }
+
+        if (user.IsBlocked)
+        {
+            return BadRequest("User is blocked");
         }
 
         if (!_identityService.VerifyPasswordHash(loginModel.Password, user.PasswordHash))

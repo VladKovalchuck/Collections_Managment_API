@@ -31,17 +31,7 @@ public class UserController : Controller
             return NotFound("User not found");
         }
 
-        UserModel resultUser = new UserModel()
-        {
-            Id = user.Id,
-            Username = user.Username,
-            EmailAddress = user.EmailAddress,
-            RoleId = user.RoleId,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            PasswordHash = user.PasswordHash
-        };
-        return Ok(resultUser);
+        return Ok(ConvertToUserModel(user));
     }
 
     [HttpPost("createUser")]
@@ -50,7 +40,7 @@ public class UserController : Controller
         var user = await _userService.SearchByLogin(registerModel.Username);
         if (user != null)
         {
-            return BadRequest("this username is already in use");
+            return BadRequest("This username is already in use");
         }
         
         _identityService.CreatePasswordHash(registerModel.Password, out byte[] passwordHash);
@@ -66,17 +56,7 @@ public class UserController : Controller
         };
         await _userService.Create(user);
         
-        UserModel resultUser = new UserModel()
-        {
-            Id = user.Id,
-            Username = user.Username,
-            EmailAddress = user.EmailAddress,
-            RoleId = user.RoleId,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            PasswordHash = user.PasswordHash
-        };
-        return Ok(resultUser);
+        return Ok(ConvertToUserModel(user));
     }
     
     [HttpPut("updateUser")]
@@ -88,20 +68,11 @@ public class UserController : Controller
         user.RoleId = updateModel.RoleId;
         user.FirstName = updateModel.FirstName;
         user.LastName = updateModel.LastName;
+        user.IsBlocked = updateModel.IsBlocked;
         
         await _userService.Update(user);
         
-        UserModel resultUser = new UserModel()
-        {
-            Id = user.Id,
-            Username = user.Username,
-            EmailAddress = user.EmailAddress,
-            RoleId = user.RoleId,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            PasswordHash = user.PasswordHash
-        };
-        return Ok(resultUser);
+        return Ok(ConvertToUserModel(user));
     }
     
     [HttpDelete("deleteUser")]
@@ -118,8 +89,28 @@ public class UserController : Controller
         {
             return NotFound();
         }
+
+        return Ok(ConvertToUserModel(user));
+    }
+
+    [HttpPut("blockUser")]
+    public async Task<ActionResult<UserModel>> BlockUser(string login)
+    {
+        var user = await _userService.SearchByLogin(login);
+        if (user == null)
+        {
+            return NotFound("User not found.");
+        }
+        user.IsBlocked = true;
         
-        UserModel resultUser = new UserModel()
+        await _userService.Update(user);
+        
+        return Ok(ConvertToUserModel(user));
+    }
+
+    private UserModel ConvertToUserModel(UserEntity user)
+    {
+        return new UserModel()
         {
             Id = user.Id,
             Username = user.Username,
@@ -127,8 +118,8 @@ public class UserController : Controller
             RoleId = user.RoleId,
             FirstName = user.FirstName,
             LastName = user.LastName,
-            PasswordHash = user.PasswordHash
+            PasswordHash = user.PasswordHash,
+            IsBlocked = user.IsBlocked
         };
-        return Ok(resultUser);
     }
 }
