@@ -1,5 +1,7 @@
+using Collections_Managment_API.Middleware;
 using CollectionsManagmentAPI.Entity;
 using CollectionsManagmentAPI.Entity.Enums;
+using CollectionsManagmentAPI.Entity.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using CollectionsManagmentAPI.Service.Interfaces;
 
@@ -18,7 +20,7 @@ public class UserIdentityController : Controller
     }
     
     [HttpPost("register")]
-    public async Task<ActionResult<UserEntity>> Register(RegisterModel registerModel)
+    public async Task<ActionResult<UserModel>> Register(RegisterModel registerModel)
     {
         var user = await _userService.SearchByLogin(registerModel.Username);
         if (user != null)
@@ -33,27 +35,17 @@ public class UserIdentityController : Controller
             PasswordHash = passwordHash,
             Username = registerModel.Username, 
             EmailAddress = registerModel.EmailAddress, 
-            RoleId = (int)Roles.User,
+            Role = (int)Roles.User,
             FirstName = registerModel.FirstName, 
             LastName = registerModel.LastName
         };
 
         await _userService.Create(user);
         
-        UserModel resultUser = new UserModel()
-        {
-            Id = user.Id,
-            Username = user.Username,
-            EmailAddress = user.EmailAddress,
-            RoleId = user.RoleId,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            PasswordHash = user.PasswordHash
-        };
-        
-        return Ok(resultUser);
+        return Ok(user.ConvertToUserModel());
     }
 
+    
     [HttpPost("login")]
     public async Task<ActionResult<string>> Login(LoginModel loginModel)
     {
@@ -63,10 +55,10 @@ public class UserIdentityController : Controller
             return NotFound("User not found.");
         }
 
-        if (user.IsBlocked)
+        /*if (user.IsBlocked)
         {
             return BadRequest("User is blocked");
-        }
+        }*/
 
         if (!_identityService.VerifyPasswordHash(loginModel.Password, user.PasswordHash))
         {

@@ -8,11 +8,11 @@ public class UserEntity
     public int Id { get; set; }
     public string Username { get; set; }
     public string EmailAddress { get; set; }
-    public int RoleId { get; set; }
+    public Roles Role { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public byte[]? PasswordHash { get; set; }
-    public bool IsBlocked { get; set; } = false;
+    public bool IsBlocked { get; set; }
 
     public ICollection<CommentEntity> Comments { get; set; }
 }
