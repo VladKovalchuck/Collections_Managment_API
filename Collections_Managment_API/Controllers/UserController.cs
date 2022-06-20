@@ -23,8 +23,14 @@ public class UserController : Controller
         _userService = userService;
         _identityService = identityService;
     }
-    
-    [HttpGet("get/{id}")]
+
+    [HttpGet("GetAll")]
+    public ActionResult<IQueryable<UserModel>> GetAll()
+    {
+        var users = _userService.GetAll();
+        return Ok(users);
+    }
+    [HttpGet("{id:int}")]
     public async Task<ActionResult<UserModel>> GetById(int id) 
     {
         var user = await _userService.GetById(id);
@@ -77,13 +83,13 @@ public class UserController : Controller
         return Ok(user.ConvertToUserModel());
     }
     
-    [HttpDelete("delete")]
+    [HttpDelete("{id:int}")]
     public async Task<bool> Delete(int id)
     {
         return await _userService.Delete(id);
     }
 
-    [HttpGet("search")]
+    [HttpGet("{login}")]
     public async Task<ActionResult<UserModel>> SearchByLogin(string login)
     {
         var user = await _userService.SearchByLogin(login);

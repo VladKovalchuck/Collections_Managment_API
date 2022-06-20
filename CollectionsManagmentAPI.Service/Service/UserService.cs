@@ -16,6 +16,11 @@ public class UserService : IUserService
         _userRepository = userRepository;
     }
 
+    public IQueryable<UserEntity> GetAll()
+    {
+        return _userRepository.GetAll();
+    }
+
     public async Task<UserEntity> GetById(int id)
     {
         var user = await _userRepository.GetById(id);

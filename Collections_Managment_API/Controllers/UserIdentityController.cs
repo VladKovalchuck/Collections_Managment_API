@@ -55,11 +55,6 @@ public class UserIdentityController : Controller
             return NotFound("User not found.");
         }
 
-        /*if (user.IsBlocked)
-        {
-            return BadRequest("User is blocked");
-        }*/
-
         if (!_identityService.VerifyPasswordHash(loginModel.Password, user.PasswordHash))
         {
             return BadRequest("Wrong password.");

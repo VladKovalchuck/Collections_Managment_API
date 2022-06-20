@@ -10,7 +10,12 @@ public class CollectionsDbContext : DbContext
     {
         
     }
-    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<UserEntity>()
+            .Property(u => u.Role)
+            .HasConversion<string>();
+    }
     public DbSet<CollectionEntity> Collections { get; set; }
     public DbSet<ItemEntity> Items { get; set; }
     public DbSet<UserEntity> Users { get; set; }
