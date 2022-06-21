@@ -21,6 +21,11 @@ public class UserService : IUserService
         return _userRepository.GetAll();
     }
 
+    public IQueryable<UserEntity> GetRange(int skip, int take)
+    {
+        return _userRepository.GetAll().OrderBy(u => u.Id).Skip(skip).Take(take);
+    }
+    
     public async Task<UserEntity> GetById(int id)
     {
         var user = await _userRepository.GetById(id);
@@ -43,7 +48,7 @@ public class UserService : IUserService
         return result;
     }
 
-    public async Task<UserEntity> SearchByLogin(string login)
+    public UserEntity SearchByLogin(string login)
     {
         var user = _userRepository.GetAll().FirstOrDefault(u => u.Username == login);
         return user;

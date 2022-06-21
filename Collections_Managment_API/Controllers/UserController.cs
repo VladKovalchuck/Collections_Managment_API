@@ -1,18 +1,16 @@
-using Collections_Managment_API.Middleware;
 using CollectionsManagmentAPI.Entity;
 using CollectionsManagmentAPI.Entity.Enums;
 using CollectionsManagmentAPI.Entity.Extensions;
 using CollectionsManagmentAPI.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Collections_Managment_API.Controllers;
 
 [ApiController]
 [Authorize (Roles = "Admin")]
-[SwaggerTag("User")]
+[Route("User")]
 public class UserController : Controller
 {
     private readonly IUserService _userService;
@@ -25,10 +23,30 @@ public class UserController : Controller
     }
 
     [HttpGet("")]
-    public ActionResult<IQueryable<UserModel>> GetAll()
+    public ActionResult<List<UserModel>> GetAll()
     {
         var users = _userService.GetAll();
-        return Ok(users);
+
+        List<UserModel> resultUsers = new List<UserModel>();
+        foreach (var user in users)
+        {
+            resultUsers.Add(user.ConvertToUserModel());
+        }
+        return Ok(resultUsers);
+    }
+
+    [HttpGet("{skip:int}/{take:int}")]
+    public ActionResult<List<UserModel>> GetRange(int skip, int take)
+    {
+        var users = _userService.GetRange(skip, take);
+        
+        List<UserModel> resultUsers = new List<UserModel>();
+        foreach (var user in users)
+        {
+            resultUsers.Add(user.ConvertToUserModel());
+        }
+        
+        return Ok(resultUsers);
     }
     [HttpGet("{id:int}")]
     public async Task<ActionResult<UserModel>> GetById(int id) 
@@ -45,7 +63,7 @@ public class UserController : Controller
     [HttpPost("")]
     public async Task<ActionResult<UserModel>> Create(RegisterModel registerModel)
     {
-        var user = await _userService.SearchByLogin(registerModel.Username);
+        var user = _userService.SearchByLogin(registerModel.Username);
         if (user != null)
         {
             return BadRequest("This username is already in use");
@@ -71,6 +89,7 @@ public class UserController : Controller
     public async Task<ActionResult<UserModel>> Update(UpdateModel updateModel)
     {
         var user = await _userService.GetById(updateModel.Id);
+        
         user.Username = updateModel.Username;
         user.EmailAddress = updateModel.EmailAddress;
         user.Role = updateModel.Role;
@@ -90,9 +109,9 @@ public class UserController : Controller
     }
 
     [HttpGet("{login}")]
-    public async Task<ActionResult<UserModel>> SearchByLogin(string login)
+    public ActionResult<UserModel> SearchByLogin(string login)
     {
-        var user = await _userService.SearchByLogin(login);
+        var user = _userService.SearchByLogin(login);
         if (user == null)
         {
             return NotFound();

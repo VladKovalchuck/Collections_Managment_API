@@ -22,7 +22,7 @@ public class UserIdentityController : Controller
     [HttpPost("register")]
     public async Task<ActionResult<UserModel>> Register(RegisterModel registerModel)
     {
-        var user = await _userService.SearchByLogin(registerModel.Username);
+        var user = _userService.SearchByLogin(registerModel.Username);
         if (user != null)
         {
             return BadRequest("This username is already in use");
@@ -47,9 +47,9 @@ public class UserIdentityController : Controller
 
     
     [HttpPost("login")]
-    public async Task<ActionResult<string>> Login(LoginModel loginModel)
+    public ActionResult<string> Login(LoginModel loginModel)
     {
-        var user = await _userService.SearchByLogin(loginModel.Login);
+        var user = _userService.SearchByLogin(loginModel.Login);
         if (user == null)
         {
             return NotFound("User not found.");
