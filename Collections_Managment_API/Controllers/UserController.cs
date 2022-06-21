@@ -67,7 +67,7 @@ public class UserController : Controller
         return Ok(user.ConvertToUserModel());
     }
     
-    [HttpPut("update")]
+    [HttpPut("")]
     public async Task<ActionResult<UserModel>> Update(UpdateModel updateModel)
     {
         var user = await _userService.GetById(updateModel.Id);
