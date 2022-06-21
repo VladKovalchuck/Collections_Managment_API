@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using CollectionsManagmentAPI.Entity;
+using CollectionsManagmentAPI.Entity.Enums;
 using CollectionsManagmentAPI.Service.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -34,7 +35,9 @@ public class IdentityService : IIdentityService
     {
         List<Claim> claims = new List<Claim>()
         {
-            new Claim(ClaimTypes.Name, user.Username)
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Role, user.Role.ToString()),
+            new Claim("Banned", user.IsBlocked.ToString())
         };
         
         var token = new JwtSecurityToken(
@@ -43,7 +46,6 @@ public class IdentityService : IIdentityService
             signingCredentials: AuthOptions.Credentials,
             audience: AuthOptions.Audience,
             issuer: AuthOptions.Issuer
-
         );
 
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);

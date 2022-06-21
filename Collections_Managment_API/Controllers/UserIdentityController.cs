@@ -1,4 +1,7 @@
+using Collections_Managment_API.Middleware;
 using CollectionsManagmentAPI.Entity;
+using CollectionsManagmentAPI.Entity.Enums;
+using CollectionsManagmentAPI.Entity.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using CollectionsManagmentAPI.Service.Interfaces;
 
@@ -17,12 +20,12 @@ public class UserIdentityController : Controller
     }
     
     [HttpPost("register")]
-    public async Task<ActionResult<UserEntity>> Register(RegisterModel registerModel)
+    public async Task<ActionResult<UserModel>> Register(RegisterModel registerModel)
     {
-        UserEntity user = await _userService.SearchByLogin(registerModel.Username);
+        var user = await _userService.SearchByLogin(registerModel.Username);
         if (user != null)
         {
-            return BadRequest("this username is already in use");
+            return BadRequest("This username is already in use");
         }
         
         _identityService.CreatePasswordHash(registerModel.Password, out byte[] passwordHash);
@@ -32,15 +35,17 @@ public class UserIdentityController : Controller
             PasswordHash = passwordHash,
             Username = registerModel.Username, 
             EmailAddress = registerModel.EmailAddress, 
+            Role = (int)Roles.User,
             FirstName = registerModel.FirstName, 
             LastName = registerModel.LastName
         };
 
         await _userService.Create(user);
         
-        return Ok(user);
+        return Ok(user.ConvertToUserModel());
     }
 
+    
     [HttpPost("login")]
     public async Task<ActionResult<string>> Login(LoginModel loginModel)
     {
