@@ -24,7 +24,7 @@ public class UserController : Controller
         _identityService = identityService;
     }
 
-    [HttpGet("GetAll")]
+    [HttpGet("")]
     public ActionResult<IQueryable<UserModel>> GetAll()
     {
         var users = _userService.GetAll();
@@ -42,7 +42,7 @@ public class UserController : Controller
         return Ok(user.ConvertToUserModel());
     }
 
-    [HttpPost("create")]
+    [HttpPost("")]
     public async Task<ActionResult<UserModel>> Create(RegisterModel registerModel)
     {
         var user = await _userService.SearchByLogin(registerModel.Username);
