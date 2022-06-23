@@ -20,6 +20,7 @@ public class UserEntity
     public string? LastName { get; set; }
     public byte[]? PasswordHash { get; set; }
     public bool IsBlocked { get; set; }
+    public ICollection<CollectionEntity>? Collections { get; set; }
 
     public ICollection<CommentEntity> Comments { get; set; }
 }

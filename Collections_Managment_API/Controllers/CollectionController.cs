@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using CollectionsManagmentAPI.Entity;
 using CollectionsManagmentAPI.Entity.Extensions;
 using CollectionsManagmentAPI.Entity.Models.Collection;
@@ -15,10 +16,12 @@ namespace Collections_Managment_API.Controllers;
 public class CollectionController : Controller
 {
     private readonly ICollectionService _collectionService;
+    private readonly IUserService _userService;
 
-    public CollectionController(ICollectionService collectionService)
+    public CollectionController(ICollectionService collectionService, IUserService userService)
     {
         _collectionService = collectionService;
+        _userService = userService;
     }
 
     [HttpGet("")]
@@ -55,18 +58,24 @@ public class CollectionController : Controller
         var collection = await _collectionService.GetById(id);
         if (collection is null)
             return NotFound("Collection not found.");
-
+        
         return Ok(collection.ConvertToCollectionModel());
     }
 
     [HttpPost("")]
     public async Task<ActionResult<CollectionModel>> Create(CollectionCreateModel createModel)
     {
+        var name = this.HttpContext.User.Claims
+            .FirstOrDefault(x => x.Type == ClaimTypes.Name);
+
+        var user = _userService.SearchByLogin(name.Value);
+        
         var collection = new CollectionEntity()
         {
             Name = createModel.Name,
             Description = createModel.Description,
-            Topic = createModel.Topic
+            Topic = createModel.Topic,
+            UserId = user.Id
         };
         await _collectionService.Create(collection);
 
@@ -76,7 +85,17 @@ public class CollectionController : Controller
     [HttpPut("")]
     public async Task<ActionResult<CollectionModel>> Update(CollectionModel updateModel)
     {
+        var name = this.HttpContext.User.Claims
+            .FirstOrDefault(x => x.Type == ClaimTypes.Name);
+
+        var user = _userService.SearchByLogin(name.Value);
+        
         var collection = await _collectionService.GetById(updateModel.Id);
+        
+        if (user.Id != collection.UserId)
+        {
+            return BadRequest("Not your collection");
+        }
 
         collection.Name = updateModel.Name;
         collection.Description = updateModel.Description;
