@@ -10,7 +10,7 @@ namespace Collections_Managment_API.Controllers;
 
 [ApiController]
 [Authorize (Roles = "Admin")]
-[Route("User")]
+[Route("[controller]")]
 public class UserController : Controller
 {
     private readonly IUserService _userService;

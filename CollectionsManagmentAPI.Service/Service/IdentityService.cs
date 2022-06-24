@@ -37,6 +37,7 @@ public class IdentityService : IIdentityService
         {
             new Claim(ClaimTypes.Name, user.Username),
             new Claim(ClaimTypes.Role, user.Role.ToString()),
+            new Claim("Id", user.Id.ToString()),
             new Claim("Banned", user.IsBlocked.ToString())
         };
         

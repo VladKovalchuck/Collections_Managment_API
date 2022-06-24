@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using CollectionsManagmentAPI.Entity;
+using CollectionsManagmentAPI.Entity.Enums;
 using CollectionsManagmentAPI.Entity.Extensions;
 using CollectionsManagmentAPI.Entity.Models.Collection;
 using CollectionsManagmentAPI.Service.Interfaces;
@@ -10,9 +11,9 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace Collections_Managment_API.Controllers;
 
 [ApiController]
-[Authorize (Roles = "Admin")]
+[Authorize (Roles = "Admin, User")]
 [SwaggerTag("Collection")]
-[Route("Collection")]
+[Route("[controller]")]
 public class CollectionController : Controller
 {
     private readonly ICollectionService _collectionService;
@@ -27,29 +28,13 @@ public class CollectionController : Controller
     [HttpGet("")]
     public ActionResult<List<CollectionModel>> GetAll()
     {
-        var collections = _collectionService.GetAll();
-
-        List<CollectionModel> resultCollections = new List<CollectionModel>();
-        foreach (var collection in collections)
-        {
-            resultCollections.Add(collection.ConvertToCollectionModel());
-        }
-
-        return Ok(resultCollections);
+        return Ok(_collectionService.GetAll());
     }
 
     [HttpGet("{skip:int}/{take:int}")]
     public ActionResult<List<CollectionModel>> GetRange(int skip, int take)
     {
-        var collections = _collectionService.GetRange(skip, take);
-        
-        List<CollectionModel> resultCollections = new List<CollectionModel>();
-        foreach (var collection in collections)
-        {
-            resultCollections.Add(collection.ConvertToCollectionModel());
-        }
-
-        return Ok(resultCollections);
+        return Ok(_collectionService.GetRange(skip, take));
     }
 
     [HttpGet("{id:int}")]
@@ -63,12 +48,9 @@ public class CollectionController : Controller
     }
 
     [HttpPost("")]
-    public async Task<ActionResult<CollectionModel>> Create(CollectionCreateModel createModel)
+    public async Task<ActionResult<CollectionModel>> Create(CollectionModel createModel)
     {
-        var name = this.HttpContext.User.Claims
-            .FirstOrDefault(x => x.Type == ClaimTypes.Name);
-
-        var user = _userService.SearchByLogin(name.Value);
+        var user = await GetFromToken.GetUserFromToken(HttpContext, _userService);
         
         var collection = new CollectionEntity()
         {
@@ -85,23 +67,16 @@ public class CollectionController : Controller
     [HttpPut("")]
     public async Task<ActionResult<CollectionModel>> Update(CollectionModel updateModel)
     {
-        var name = this.HttpContext.User.Claims
-            .FirstOrDefault(x => x.Type == ClaimTypes.Name);
-
-        var user = _userService.SearchByLogin(name.Value);
+        var user = await GetFromToken.GetUserFromToken(HttpContext, _userService);
         
         var collection = await _collectionService.GetById(updateModel.Id);
         
-        if (user.Id != collection.UserId)
+        if (user.Id != collection.UserId && user.Role != Roles.Admin)
         {
             return BadRequest("Not your collection");
         }
 
-        collection.Name = updateModel.Name;
-        collection.Description = updateModel.Description;
-        collection.Topic = updateModel.Topic;
-
-        await _collectionService.Update(collection);
+        await _collectionService.Update(collection, updateModel);
         
         return Ok(collection.ConvertToCollectionModel());
     }
