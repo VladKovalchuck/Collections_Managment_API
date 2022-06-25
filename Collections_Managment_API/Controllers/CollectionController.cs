@@ -11,7 +11,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace Collections_Managment_API.Controllers;
 
 [ApiController]
-[Authorize (Roles = "Admin, User")]
+
 [SwaggerTag("Collection")]
 [Route("[controller]")]
 public class CollectionController : Controller
@@ -26,68 +26,59 @@ public class CollectionController : Controller
     }
 
     [HttpGet("")]
+    [Authorize (Roles = "User")]
     public ActionResult<List<CollectionModel>> GetAll()
     {
         return Ok(_collectionService.GetAll());
     }
 
     [HttpGet("{skip:int}/{take:int}")]
+    [Authorize (Roles = "User")]
     public ActionResult<List<CollectionModel>> GetRange(int skip, int take)
     {
         return Ok(_collectionService.GetRange(skip, take));
     }
 
     [HttpGet("{id:int}")]
+    [Authorize (Roles = "User")]
     public async Task<ActionResult<CollectionModel>> GetById(int id)
     {
         var collection = await _collectionService.GetById(id);
         if (collection is null)
             return NotFound("Collection not found.");
         
-        return Ok(collection.ConvertToCollectionModel());
+        return Ok(collection);
     }
 
     [HttpPost("")]
+    [Authorize (Roles = "User")]
     public async Task<ActionResult<CollectionModel>> Create(CollectionModel createModel)
     {
-        var user = await GetFromToken.GetUserFromToken(HttpContext, _userService);
+        var userId = (await GetFromToken.GetUserFromToken(HttpContext, _userService)).Id;
         
-        var collection = new CollectionEntity()
-        {
-            Name = createModel.Name,
-            Description = createModel.Description,
-            Topic = createModel.Topic,
-            UserId = user.Id
-        };
-        await _collectionService.Create(collection);
+        var collection = await _collectionService.Create(createModel, userId);
 
-        return Ok(collection.ConvertToCollectionModel());
+        return Ok(collection);
     }
 
     [HttpPut("")]
+    [Authorize (Roles = "User, Admin")]
     public async Task<ActionResult<CollectionModel>> Update(CollectionModel updateModel)
     {
-        var user = await GetFromToken.GetUserFromToken(HttpContext, _userService);
-        
-        var collection = await _collectionService.GetById(updateModel.Id);
-        
-        if (user.Id != collection.UserId && user.Role != Roles.Admin)
-        {
-            return BadRequest("Not your collection");
-        }
+        await _collectionService.Update(updateModel);
 
-        await _collectionService.Update(collection, updateModel);
-        
-        return Ok(collection.ConvertToCollectionModel());
+        return Ok(updateModel);
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize (Roles = "User")]
     public async Task<bool> Delete(int id)
     {
         return await _collectionService.Delete(id);
     }
 
     [HttpGet("{name}")]
+    [Authorize (Roles = "User")]
     public ActionResult<CollectionModel> SearchByName(string name)
     {
         var collection = _collectionService.SearchByName(name);

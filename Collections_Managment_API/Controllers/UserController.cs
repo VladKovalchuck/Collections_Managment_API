@@ -25,28 +25,13 @@ public class UserController : Controller
     [HttpGet("")]
     public ActionResult<List<UserModel>> GetAll()
     {
-        var users = _userService.GetAll();
-
-        List<UserModel> resultUsers = new List<UserModel>();
-        foreach (var user in users)
-        {
-            resultUsers.Add(user.ConvertToUserModel());
-        }
-        return Ok(resultUsers);
+        return Ok(_userService.GetAll());
     }
 
     [HttpGet("{skip:int}/{take:int}")]
     public ActionResult<List<UserModel>> GetRange(int skip, int take)
     {
-        var users = _userService.GetRange(skip, take);
-        
-        List<UserModel> resultUsers = new List<UserModel>();
-        foreach (var user in users)
-        {
-            resultUsers.Add(user.ConvertToUserModel());
-        }
-        
-        return Ok(resultUsers);
+        return Ok(_userService.GetRange(skip, take));
     }
     [HttpGet("{id:int}")]
     public async Task<ActionResult<UserModel>> GetById(int id) 
@@ -88,18 +73,8 @@ public class UserController : Controller
     [HttpPut("")]
     public async Task<ActionResult<UserModel>> Update(UpdateModel updateModel)
     {
-        var user = await _userService.GetById(updateModel.Id);
-        
-        user.Username = updateModel.Username;
-        user.EmailAddress = updateModel.EmailAddress;
-        user.Role = updateModel.Role;
-        user.FirstName = updateModel.FirstName;
-        user.LastName = updateModel.LastName;
-        user.IsBlocked = updateModel.IsBlocked;
-        
-        await _userService.Update(user);
-        
-        return Ok(user.ConvertToUserModel());
+        var user = await _userService.Update(updateModel);
+        return Ok(user);
     }
     
     [HttpDelete("{id:int}")]

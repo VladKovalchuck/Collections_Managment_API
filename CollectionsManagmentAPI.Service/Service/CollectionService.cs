@@ -1,11 +1,14 @@
 using CollectionsManagmentAPI.DataAccess.Interfaces;
 using CollectionsManagmentAPI.DataAccess.Repositories;
 using CollectionsManagmentAPI.Entity;
+using CollectionsManagmentAPI.Entity.Enums;
 using CollectionsManagmentAPI.Entity.Extensions;
 using CollectionsManagmentAPI.Entity.Models.Collection;
 using CollectionsManagmentAPI.Service.Interfaces;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Update;
-using Microsoft.VisualBasic;
+
 
 namespace CollectionsManagmentAPI.Service.Service;
 
@@ -42,19 +45,28 @@ public class CollectionService : ICollectionService
         return resultCollections;
     }
 
-    public async Task<CollectionEntity> GetById(int id)
+    public async Task<CollectionModel> GetById(int id)
     {
-        return await _collectionRepository.GetById(id);
+        return (await _collectionRepository.GetById(id)).ConvertToCollectionModel();
     }
 
-    public async Task Create(CollectionEntity collection)
+    public async Task<CollectionModel> Create(CollectionModel createModel, int userId)
     {
+        var collection = new CollectionEntity()
+        {
+            Name = createModel.Name,
+            Description = createModel.Description,
+            Topic = createModel.Topic,
+            UserId = userId
+        };
         await _collectionRepository.Create(collection);
+        return collection.ConvertToCollectionModel();
     }
 
-    public async Task Update(CollectionEntity collection, CollectionModel updateModel)
+    public async Task Update(CollectionModel updateModel)
     {
-        collection.Id = updateModel.Id;
+        var collection = await _collectionRepository.GetById(updateModel.Id);
+        
         collection.Name = updateModel.Name;
         collection.Description = updateModel.Description;
         collection.Topic = updateModel.Topic;

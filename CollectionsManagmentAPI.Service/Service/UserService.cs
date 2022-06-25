@@ -2,6 +2,7 @@ using CollectionsManagmentAPI.DataAccess;
 using CollectionsManagmentAPI.DataAccess.Interfaces;
 using CollectionsManagmentAPI.DataAccess.Repositories;
 using CollectionsManagmentAPI.Entity;
+using CollectionsManagmentAPI.Entity.Extensions;
 using CollectionsManagmentAPI.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,14 +17,28 @@ public class UserService : IUserService
         _userRepository = userRepository;
     }
 
-    public IQueryable<UserEntity> GetAll()
+    public List<UserModel> GetAll()
     {
-        return _userRepository.GetAll();
+        var users = _userRepository.GetAll();
+        List<UserModel> resultUsers = new List<UserModel>();
+        foreach (var user in users)
+        {
+            resultUsers.Add(user.ConvertToUserModel());
+        }
+
+        return resultUsers;
     }
 
-    public IQueryable<UserEntity> GetRange(int skip, int take)
+    public List<UserModel> GetRange(int skip, int take)
     {
-        return _userRepository.GetAll().OrderBy(u => u.Id).Skip(skip).Take(take);
+        var users = _userRepository.GetAll().OrderBy(u => u.Id).Skip(skip).Take(take);
+        List<UserModel> resultUsers = new List<UserModel>();
+        foreach (var user in users)
+        {
+            resultUsers.Add(user.ConvertToUserModel());
+        }
+
+        return resultUsers;
     }
     
     public async Task<UserEntity> GetById(int id)
@@ -37,9 +52,19 @@ public class UserService : IUserService
         await _userRepository.Create(user);
     }
 
-    public async Task Update(UserEntity user)
+    public async Task<UserModel> Update(UpdateModel updateModel)
     {
+        var user = await _userRepository.GetById(updateModel.Id);
+        
+        user.Username = updateModel.Username;
+        user.EmailAddress = updateModel.EmailAddress;
+        user.Role = updateModel.Role;
+        user.FirstName = updateModel.FirstName;
+        user.LastName = updateModel.LastName;
+        user.IsBlocked = updateModel.IsBlocked;
+        
         await _userRepository.Update(user);
+        return user.ConvertToUserModel();
     }
 
     public async Task<bool> Delete(int id)
