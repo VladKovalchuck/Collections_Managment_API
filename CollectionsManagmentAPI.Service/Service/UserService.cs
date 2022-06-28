@@ -2,6 +2,7 @@ using CollectionsManagmentAPI.DataAccess;
 using CollectionsManagmentAPI.DataAccess.Interfaces;
 using CollectionsManagmentAPI.DataAccess.Repositories;
 using CollectionsManagmentAPI.Entity;
+using CollectionsManagmentAPI.Entity.Enums;
 using CollectionsManagmentAPI.Entity.Extensions;
 using CollectionsManagmentAPI.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +12,14 @@ namespace CollectionsManagmentAPI.Service.Service;
 public class UserService : IUserService
 {
     private readonly IRepository<UserEntity> _userRepository;
-    
-    public UserService(IRepository<UserEntity> userRepository)
+    private readonly IIdentityService _identityService;
+    private readonly IUserService _userService;
+
+    public UserService(IRepository<UserEntity> userRepository, IIdentityService identityService, IUserService userService)
     {
         _userRepository = userRepository;
+        _identityService = identityService;
+        _userService = userService;
     }
 
     public List<UserModel> GetAll()
@@ -47,9 +52,29 @@ public class UserService : IUserService
         return user;
     }
     
-    public async Task Create(UserEntity user)
+    public async Task<UserModel> Create(RegisterModel registerModel)
     {
+        var userForCheck = _userService.SearchByLogin(registerModel.Username);
+        if (userForCheck != null)
+        {
+            return null;
+        }
+        
+        _identityService.CreatePasswordHash(registerModel.Password, out byte[] passwordHash);
+        
+        var user = new UserEntity()
+        {
+            PasswordHash = passwordHash,
+            Username = registerModel.Username, 
+            EmailAddress = registerModel.EmailAddress, 
+            Role = Roles.User,
+            FirstName = registerModel?.FirstName, 
+            LastName = registerModel?.LastName
+        };
+        
         await _userRepository.Create(user);
+
+        return user.ConvertToUserModel();
     }
 
     public async Task<UserModel> Update(UpdateModel updateModel)
@@ -73,9 +98,8 @@ public class UserService : IUserService
         return result;
     }
 
-    public UserEntity SearchByLogin(string login)
+    public UserModel SearchByLogin(string login)
     {
-        var user = _userRepository.GetAll().FirstOrDefault(u => u.Username == login);
-        return user;
+        return _userRepository.GetAll().FirstOrDefault(u => u.Username == login).ConvertToUserModel();
     }
 }

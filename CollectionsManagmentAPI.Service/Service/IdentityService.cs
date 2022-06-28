@@ -31,7 +31,7 @@ public class IdentityService : IIdentityService
         }
     }
 
-    public string CreateToken(UserEntity user)
+    public string CreateToken(UserModel user)
     {
         List<Claim> claims = new List<Claim>()
         {

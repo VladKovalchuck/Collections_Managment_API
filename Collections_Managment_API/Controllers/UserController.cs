@@ -48,26 +48,12 @@ public class UserController : Controller
     [HttpPost("")]
     public async Task<ActionResult<UserModel>> Create(RegisterModel registerModel)
     {
-        var user = _userService.SearchByLogin(registerModel.Username);
-        if (user != null)
-        {
+        var user = await _userService.Create(registerModel);
+        
+        if(user == null)
             return BadRequest("This username is already in use");
-        }
         
-        _identityService.CreatePasswordHash(registerModel.Password, out byte[] passwordHash);
-
-        user = new UserEntity()
-        {
-            PasswordHash = passwordHash,
-            Username = registerModel.Username, 
-            EmailAddress = registerModel.EmailAddress, 
-            Role = Roles.User,
-            FirstName = registerModel?.FirstName, 
-            LastName = registerModel?.LastName
-        };
-        await _userService.Create(user);
-        
-        return Ok(user.ConvertToUserModel());
+        return Ok(user);
     }
     
     [HttpPut("")]
@@ -92,6 +78,6 @@ public class UserController : Controller
             return NotFound();
         }
 
-        return Ok(user.ConvertToUserModel());
+        return Ok(user);
     }
 }
