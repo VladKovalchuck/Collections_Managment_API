@@ -13,6 +13,7 @@ namespace Collections_Managment_API.Controllers;
 [ApiController]
 
 [SwaggerTag("Collection")]
+[Authorize]
 [Route("[controller]")]
 public class CollectionController : Controller
 {
@@ -54,9 +55,7 @@ public class CollectionController : Controller
     [Authorize (Roles = "User")]
     public async Task<ActionResult<CollectionModel>> Create(CollectionModel createModel)
     {
-        var userId = (await GetFromToken.GetUserFromToken(HttpContext, _userService)).Id;
-        
-        var collection = await _collectionService.Create(createModel, userId);
+        var collection = await _collectionService.Create(createModel);
 
         return Ok(collection);
     }
@@ -85,6 +84,6 @@ public class CollectionController : Controller
         if (collection is null)
             return NotFound("CollectionNotFound");
 
-        return Ok(collection.ConvertToCollectionModel());
+        return Ok(collection);
     }
 }

@@ -13,6 +13,7 @@ public static class BusinessModule
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<IIdentityService, IdentityService>();
         services.AddTransient<ICollectionService, CollectionService>();
+        services.AddTransient<ITokenService, TokenService>();
         return services;
     }
 }

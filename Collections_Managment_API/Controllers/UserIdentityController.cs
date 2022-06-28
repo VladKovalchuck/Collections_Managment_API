@@ -4,6 +4,7 @@ using CollectionsManagmentAPI.Entity.Enums;
 using CollectionsManagmentAPI.Entity.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using CollectionsManagmentAPI.Service.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Collections_Managment_API.Controllers;
 

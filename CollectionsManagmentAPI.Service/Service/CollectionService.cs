@@ -15,10 +15,12 @@ namespace CollectionsManagmentAPI.Service.Service;
 public class CollectionService : ICollectionService
 {
     private readonly IRepository<CollectionEntity> _collectionRepository;
+    private readonly ITokenService _tokenService;
 
-    public CollectionService(IRepository<CollectionEntity> collectionRepository)
+    public CollectionService(IRepository<CollectionEntity> collectionRepository, ITokenService tokenService)
     {
         _collectionRepository = collectionRepository;
+        _tokenService = tokenService;
     }
 
     public List<CollectionModel> GetAll()
@@ -50,14 +52,15 @@ public class CollectionService : ICollectionService
         return (await _collectionRepository.GetById(id)).ConvertToCollectionModel();
     }
 
-    public async Task<CollectionModel> Create(CollectionModel createModel, int userId)
+    public async Task<CollectionModel> Create(CollectionModel createModel)
     {
+        var user = await _tokenService.GetUserFromToken();
         var collection = new CollectionEntity()
         {
             Name = createModel.Name,
             Description = createModel.Description,
             Topic = createModel.Topic,
-            UserId = userId
+            UserId = user.Id
         };
         await _collectionRepository.Create(collection);
         return collection.ConvertToCollectionModel();
@@ -78,8 +81,8 @@ public class CollectionService : ICollectionService
     {
         return await _collectionRepository.Delete(id);
     }
-    public CollectionEntity SearchByName(string name)
+    public CollectionModel SearchByName(string name)
     {
-        return _collectionRepository.GetAll().FirstOrDefault(c => c.Name == name);
+        return _collectionRepository.GetAll().FirstOrDefault(c => c.Name == name).ConvertToCollectionModel();
     }
 }
