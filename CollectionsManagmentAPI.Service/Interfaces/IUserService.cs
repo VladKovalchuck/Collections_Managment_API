@@ -4,10 +4,11 @@ namespace CollectionsManagmentAPI.Service.Interfaces;
 
 public interface IUserService
 {
-    IQueryable<UserEntity> GetAll();
+    List<UserModel> GetAll();
+    List<UserModel> GetRange(int skip, int take);
     Task<UserEntity> GetById(int id);
-    Task Create(UserEntity user);
-    Task Update(UserEntity user);
+    Task<UserModel> Create(RegisterModel registerModel);
+    Task<UserModel> Update(UpdateModel updateModel);
     Task<bool> Delete(int id);
-    Task<UserEntity> SearchByLogin(string login);
+    UserModel SearchByLogin(string login);
 }

@@ -31,12 +31,13 @@ public class IdentityService : IIdentityService
         }
     }
 
-    public string CreateToken(UserEntity user)
+    public string CreateToken(UserModel user)
     {
         List<Claim> claims = new List<Claim>()
         {
             new Claim(ClaimTypes.Name, user.Username),
             new Claim(ClaimTypes.Role, user.Role.ToString()),
+            new Claim("Id", user.Id.ToString()),
             new Claim("Banned", user.IsBlocked.ToString())
         };
         

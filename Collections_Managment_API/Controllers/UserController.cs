@@ -1,18 +1,16 @@
-using Collections_Managment_API.Middleware;
 using CollectionsManagmentAPI.Entity;
 using CollectionsManagmentAPI.Entity.Enums;
 using CollectionsManagmentAPI.Entity.Extensions;
 using CollectionsManagmentAPI.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace Collections_Managment_API.Controllers;
 
 [ApiController]
 [Authorize (Roles = "Admin")]
-[SwaggerTag("User")]
+[Route("[controller]")]
 public class UserController : Controller
 {
     private readonly IUserService _userService;
@@ -25,10 +23,15 @@ public class UserController : Controller
     }
 
     [HttpGet("")]
-    public ActionResult<IQueryable<UserModel>> GetAll()
+    public ActionResult<List<UserModel>> GetAll()
     {
-        var users = _userService.GetAll();
-        return Ok(users);
+        return Ok(_userService.GetAll());
+    }
+
+    [HttpGet("{skip:int}/{take:int}")]
+    public ActionResult<List<UserModel>> GetRange(int skip, int take)
+    {
+        return Ok(_userService.GetRange(skip, take));
     }
     [HttpGet("{id:int}")]
     public async Task<ActionResult<UserModel>> GetById(int id) 
@@ -45,42 +48,19 @@ public class UserController : Controller
     [HttpPost("")]
     public async Task<ActionResult<UserModel>> Create(RegisterModel registerModel)
     {
-        var user = await _userService.SearchByLogin(registerModel.Username);
-        if (user != null)
-        {
+        var user = await _userService.Create(registerModel);
+        
+        if(user == null)
             return BadRequest("This username is already in use");
-        }
         
-        _identityService.CreatePasswordHash(registerModel.Password, out byte[] passwordHash);
-
-        user = new UserEntity()
-        {
-            PasswordHash = passwordHash,
-            Username = registerModel.Username, 
-            EmailAddress = registerModel.EmailAddress, 
-            Role = Roles.User,
-            FirstName = registerModel?.FirstName, 
-            LastName = registerModel?.LastName
-        };
-        await _userService.Create(user);
-        
-        return Ok(user.ConvertToUserModel());
+        return Ok(user);
     }
     
     [HttpPut("")]
     public async Task<ActionResult<UserModel>> Update(UpdateModel updateModel)
     {
-        var user = await _userService.GetById(updateModel.Id);
-        user.Username = updateModel.Username;
-        user.EmailAddress = updateModel.EmailAddress;
-        user.Role = updateModel.Role;
-        user.FirstName = updateModel.FirstName;
-        user.LastName = updateModel.LastName;
-        user.IsBlocked = updateModel.IsBlocked;
-        
-        await _userService.Update(user);
-        
-        return Ok(user.ConvertToUserModel());
+        var user = await _userService.Update(updateModel);
+        return Ok(user);
     }
     
     [HttpDelete("{id:int}")]
@@ -90,14 +70,14 @@ public class UserController : Controller
     }
 
     [HttpGet("{login}")]
-    public async Task<ActionResult<UserModel>> SearchByLogin(string login)
+    public ActionResult<UserModel> SearchByLogin(string login)
     {
-        var user = await _userService.SearchByLogin(login);
+        var user = _userService.SearchByLogin(login);
         if (user == null)
         {
             return NotFound();
         }
 
-        return Ok(user.ConvertToUserModel());
+        return Ok(user);
     }
 }

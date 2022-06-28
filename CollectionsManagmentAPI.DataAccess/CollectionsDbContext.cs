@@ -15,6 +15,10 @@ public class CollectionsDbContext : DbContext
         modelBuilder.Entity<UserEntity>()
             .Property(u => u.Role)
             .HasConversion<string>();
+        modelBuilder.Entity<CollectionEntity>()
+            .HasOne(c => c.User)
+            .WithMany(u => u.Collections)
+            .HasForeignKey(c => c.UserId);
     }
     public DbSet<CollectionEntity> Collections { get; set; }
     public DbSet<ItemEntity> Items { get; set; }

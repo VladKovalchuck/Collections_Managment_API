@@ -20,7 +20,3 @@ public class UserModel
     public byte[]? PasswordHash { get; set; }
     public bool IsBlocked { get; set; }
 }
-
-public class StringEnumConverter<T>
-{
-}
